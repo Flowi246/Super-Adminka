@@ -8,114 +8,119 @@
 </head>
 <body>
 
-<header class="app-header">
-  <div class="logo">
-    <img src="photo/logo.png" alt="Логотип Джатсу">
-  </div>
-  <h1 class="app-title">Джатсу</h1>
-  <nav>
-    <a class="btn" href="index.html">Главная</a>
-  </nav>
-</header>
+  <!-- декоративные орбы -->
+  <div class="orb orb-a" aria-hidden="true"></div>
+  <div class="orb orb-b" aria-hidden="true"></div>
+  <div class="orb orb-c" aria-hidden="true"></div>
 
+  <header class="app-header">
+    <div class="container header-bar">
+      <div class="logo">
+        <img src="photo/logo.png" alt="Логотип Джатсу">
+      </div>
+      <h1 class="app-title"></h1>
+      <nav class="top-nav">
+        <a class="btn btn-ghost" href="index.html">Главная</a>
+      </nav>
+    </div>
+  </header>
 
-<main class="container app-centered">
-  <!-- ПОДСКАЗКА (контент прописан прямо в HTML, экранирован) -->
-<section class="hint-panel card">
-  <h3 class="hint-title">🧭 Подсказка</h3>
-  <p class="muted" style="margin:6px 0 10px">Ссылки для плееров</p>
-
-<textarea class="hint-codearea" readonly wrap="soft" spellcheck="false">
-https://gencit.info/— Холес плеер
+  <main class="container app-centered">
+    <!-- ПОДСКАЗКА -->
+    <section class="hint-panel card">
+      <h3 class="hint-title">🧭 Подсказка</h3>
+      <p class="muted" style="margin:6px 0 10px">Ссылки для плееров</p>
+      <textarea class="hint-codearea" readonly wrap="soft" spellcheck="false">
+https://gencit.info/ — Холес плеер
 
 https://polynoy-as.newplayjj.com:9443 — Аллоха плеер
 
 https://api.linktodo.ws/ — Ревал плеер
 
 https://kodik.cc/ — Кодик плеер
-</textarea>
+      </textarea>
+    </section>
 
-</section>
-
-
-
-  <!-- ПАРСЕР -->
-  <section id="parser" class="parser-section card">
-    <div class="card-header">
-      <h2>📑 Парсер сезонов</h2>
-      <span id="save-status" class="status-indicator status-saved" title="Все изменения сохранены"></span>
-    </div>
-
-    <div class="form-group">
-      <label class="field">
-        <span class="field-label">Домен</span>
-        <input id="domain-input" class="input" placeholder="example.com">
-      </label>
-
-      <label class="field">
-        <span class="field-label">Kinopoisk ID</span>
-        <input id="id-input" class="input" placeholder="361699">
-      </label>
-
-      <div class="field field-actions">
-        <button id="action-button" class="btn btn-primary">Получить данные</button>
+    <!-- ПАРСЕР -->
+    <section id="parser" class="parser-section card">
+      <div class="card-header">
+        <h2>📑 Парсер сезонов</h2>
+        <span id="save-status" class="status-indicator status-saved" title="Все изменения сохранены"></span>
       </div>
-    </div>
 
-    <div id="result-div" class="msg"></div>
+      <div class="form-group">
+        <label class="field">
+          <span class="field-label">Домен</span>
+          <input id="domain-input" class="input" placeholder="example.com">
+        </label>
 
-    <div class="downloads-wrap">
-      <div class="downloads-head">
-        <h3>Сезоны</h3>
-        <span class="muted">клик по сезону — скачать JSON</span>
+        <label class="field">
+          <span class="field-label">Kinopoisk ID</span>
+          <input id="id-input" class="input" placeholder="361699">
+        </label>
+
+        <div class="field field-actions">
+          <button id="action-button" class="btn btn-primary">Получить данные</button>
+        </div>
       </div>
-      <div id="download-buttons-container" class="chips"></div>
+
+      <div id="result-div" class="msg"></div>
+
+      <div class="downloads-wrap">
+        <div class="downloads-head">
+          <h3>Сезоны</h3>
+          <span class="muted">клик по сезону — скачать JSON</span>
+        </div>
+        <div id="download-buttons-container" class="chips"></div>
+      </div>
+    </section>
+
+    <!-- СВОДКА -->
+    <section id="summary" class="summary-section card">
+      <div class="card-header">
+        <h2>📋 Сводка по API</h2>
+        <button id="fetch-summary" class="btn btn-accent">Загрузить сводку</button>
+      </div>
+
+      <div id="summary-chips" class="chips"></div>
+
+      <div class="table-wrap">
+        <table class="table" id="summary-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Источник</th>
+              <th>Название (RU)</th>
+              <th>Название (EN/ориг.)</th>
+              <th>Последний сезон</th>
+              <th>Последняя серия</th>
+            </tr>
+          </thead>
+          <tbody><!-- строки добавит скрипт --></tbody>
+        </table>
+      </div>
+
+      <div class="breakdowns-head">
+        <h3>📦 Сводка по сезонам (по источникам)</h3>
+        <span class="muted">в каждом источнике: «сезон → количество серий»</span>
+      </div>
+      <div id="per-api-breakdowns" class="grid-breakdowns"></div>
+
+      <div id="summary-msg" class="msg"></div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <div class="container">
+      <p class="muted">© 2025 — Джатсу</p>
     </div>
-  </section>
+  </footer>
 
-  <!-- СВОДКА -->
-  <section id="summary" class="summary-section card">
-    <div class="card-header">
-      <h2>📋 Сводка по API</h2>
-      <button id="fetch-summary" class="btn btn-accent">Загрузить сводку</button>
-    </div>
-
-    <div id="summary-chips" class="chips"></div>
-
-    <div class="table-wrap">
-      <table class="table" id="summary-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Источник</th>
-            <th>Название (RU)</th>
-            <th>Название (EN/ориг.)</th>
-            <th>Последний сезон</th>
-            <th>Последняя серия</th>
-          </tr>
-        </thead>
-        <tbody><!-- строки добавит скрипт --></tbody>
-      </table>
-    </div>
-
-    <div class="breakdowns-head">
-      <h3>📦 Сводка по сезонам (по источникам)</h3>
-      <span class="muted">в каждом источнике: «сезон → количество серий»</span>
-    </div>
-    <div id="per-api-breakdowns" class="grid-breakdowns"></div>
-
-    <div id="summary-msg" class="msg"></div>
-  </section>
-</main>
-
-<footer class="app-footer">
-  <p class="muted">© 2025 — Джатсу</p>
-</footer>
-
-<!-- твои файлы логики -->
-<script src="parser.js" defer></script>
-<script src="api-summary.js" defer></script>
+  <!-- логика -->
+  <script src="parser.js" defer></script>
+  <script src="api-summary.js" defer></script>
 </body>
 </html>
+
 
 

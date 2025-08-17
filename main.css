@@ -1,62 +1,140 @@
-:root {
-  --bg:#0b0f14; 
-  --text:#e8eef6; 
+:root{
+  /* Базовые цвета */
+  --bg:#0b0f14;
+  --text:#e9eef7;
   --muted:#9fb0c4;
-  --primary:#4f86ff; 
-  --accent:#12c2a9; 
-  --shadow:0 8px 28px rgba(0,0,0,.28);
+
+  --primary:#6b9aff;
+  --primary-2:#3f7bff;
+  --accent:#12c2a9;
+
+  --surface:#0f151f;
+  --glass:rgba(17,23,34,.6);
+  --border:#1b2633;
+
+  /* Ритм */
+  --radius:16px;
+  --shadow:0 10px 30px rgba(0,0,0,.35);
+  --ring:0 0 0 2px rgba(123,166,255,.45);
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; }
-body {
-  background: var(--bg); 
-  color: var(--text);
-  font: 14px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  display: flex;
-  flex-direction: column;
+*{box-sizing:border-box}
+*:focus{outline:none}
+:focus-visible{box-shadow:var(--ring)}
+
+html,body{height:100%}
+body{
+  margin:0;
+  color:var(--text);
+  font:14px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+
+  /* фон: мягкие градиенты + сетка */
+  background:
+    radial-gradient(1200px 800px at 10% -10%, rgba(18,194,169,.07), transparent 55%),
+    radial-gradient(1000px 700px at 110% 0%, rgba(91,141,255,.09), transparent 60%),
+    linear-gradient(180deg,#0b0f14,#0c121a);
 }
 
-/* Header & Footer */
-.app-header, .app-footer {
-  display: flex; 
-  align-items: center; 
-  justify-content: space-between; 
-  padding: 14px 18px; 
-}
-.app-footer { margin-top: auto; color: var(--muted); text-align: center; }
+/* Орбы (декор) */
+.orb{position:fixed; filter:blur(40px); opacity:.45; z-index:-1; pointer-events:none;}
+.orb-a{width:420px;height:420px;background:radial-gradient(circle at 30% 30%, #4e86ff, transparent 60%); top:-120px; left:-80px;}
+.orb-b{width:520px;height:520px;background:radial-gradient(circle at 70% 40%, #12c2a9, transparent 65%); bottom:-160px; right:-120px;}
+.orb-c{width:300px;height:300px;background:radial-gradient(circle at 50% 50%, #7aa4ff, transparent 60%); top:40%; left:-120px;}
 
-/* Hero Section */
-.hero {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  padding: 40px 20px;
+/* Контейнер */
+.container{max-width:1080px;margin:0 auto;padding:0 20px}
+
+/* Header */
+.app-header{
+  position:sticky; top:0; z-index:10;
+  backdrop-filter: blur(10px);
+  background:linear-gradient(180deg, rgba(17,23,34,.65), rgba(17,23,34,.35));
+  border-bottom:1px solid rgba(255,255,255,.05);
 }
-.hero-title {
-  font-size: 32px;
-  margin-bottom: 10px;
+.app-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px}
+.brand{display:flex;gap:10px;align-items:center;font-weight:700;letter-spacing:.3px}
+.brand span{background:linear-gradient(90deg,#88b0ff,#12c2a9); -webkit-background-clip:text; background-clip:text; color:transparent}
+.top-nav{display:flex;gap:14px}
+.top-nav a{color:#cfe0ff;text-decoration:none;opacity:.9}
+.top-nav a:hover{opacity:1;text-decoration:underline}
+
+/* Hero */
+.hero{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 120px); text-align:center}
+.hero .container{width:100%}
+.hero-title{
+  font-size:clamp(28px, 5vw, 48px);
+  font-weight:800; letter-spacing:.2px; margin:10px 0 6px;
 }
-.hero-subtitle {
-  font-size: 16px;
-  margin-bottom: 20px;
-  color: var(--muted);
+.grad{
+  background:linear-gradient(90deg,#7aa4ff 0%, #12c2a9 40%, #7aa4ff 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  background-size:200% 100%; animation:shine 8s linear infinite;
+}
+@keyframes shine{to{background-position:200% 0}}
+
+.hero-subtitle{color:var(--muted); font-size:16px; margin:8px 0 22px}
+
+/* CTA buttons */
+.hero-actions{display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom:26px}
+.btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:12px 18px; border-radius:12px; text-decoration:none; cursor:pointer;
+  transition:transform .16s ease, box-shadow .16s ease, background .16s ease, border-color .16s ease;
+  border:1px solid var(--border);
+  background:linear-gradient(180deg,#141c26,#101724);
+  color:var(--text);
+  box-shadow:0 6px 18px rgba(0,0,0,.25);
+}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn-primary{
+  border:none;
+  color:#08101a;
+  background:linear-gradient(180deg,var(--primary),var(--primary-2));
+  box-shadow:0 10px 24px rgba(99,146,255,.35);
+}
+.btn-primary:hover{background:linear-gradient(180deg,#7aa7ff,#4e86ff)}
+.btn-ghost{
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.08);
 }
 
-/* Button */
-.btn {
-  border: none; 
-  background: var(--primary); 
-  color: #fff;
-  padding: 12px 20px; 
-  border-radius: 8px; 
-  cursor: pointer; 
-  transition: .2s;
-  text-decoration: none;
-  font-size: 16px;
-  box-shadow: var(--shadow);
+/* Tiles */
+.tiles{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:14px;
+  margin:0 auto;
 }
-.btn:hover { background: var(--accent); }
+.tile{
+  display:flex; flex-direction:column; align-items:flex-start; gap:6px;
+  padding:16px;
+  border-radius:14px;
+  text-decoration:none;
+  color:var(--text);
+  background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+  border:1px solid rgba(255,255,255,.06);
+  backdrop-filter: blur(8px);
+  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  box-shadow:var(--shadow);
+}
+.tile:hover{ transform:translateY(-2px); border-color:rgba(122,164,255,.35); box-shadow:0 12px 28px rgba(0,0,0,.35); }
+.tile-icon{font-size:24px}
+.tile-title{font-size:16px; font-weight:700}
+.tile-text{color:var(--muted); font-size:13px; line-height:1.5}
+
+/* Footer */
+.app-footer{padding:18px 0; color:var(--muted); border-top:1px solid rgba(255,255,255,.06); background:rgba(15,21,31,.35); backdrop-filter: blur(6px);}
+
+/* Доступность / системные предпочтения */
+@media (prefers-reduced-motion:reduce){
+  .btn,.tile{transition:none}
+  .grad{animation:none}
+}
+
+/* Мобильные отступы */
+@media (max-width:480px){
+  .hero-actions{gap:10px}
+  .btn{width:100%}
+}
+

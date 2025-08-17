@@ -7,98 +7,126 @@
   <link rel="stylesheet" href="krayl.css" />
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
-      <h1>SEO Crawler (Live)</h1>
-      <div class="muted">Непрерывный краулинг: новые ссылки подтягиваются автоматически</div>
 
-      <div class="row" style="margin-top:10px">
-        <label class="field">
-          <span>Домен/URL</span>
-          <input id="domain" class="input" type="text" placeholder="https://garri-potter-lordfillm.ru" />
-        </label>
-        <label class="field">
-          <span>Глубина</span>
-          <input id="depth" class="input" type="number" min="0" step="1" value="1" />
-        </label>
-        <label class="field">
-          <span>Лимит страниц</span>
-          <input id="limit" class="input" type="number" min="1" step="1" value="5000" />
-        </label>
-        <label class="field">
-          <span>Конкурентность</span>
-          <input id="concurrency" class="input" type="number" min="1" max="10" step="1" value="4" />
-        </label>
-        <label class="field">
-          <span>Таймаут (сек)</span>
-          <input id="timeout" class="input" type="number" min="3" step="1" value="15" />
-        </label>
+  <!-- декоративные орбы -->
+  <div class="orb orb-a" aria-hidden="true"></div>
+  <div class="orb orb-b" aria-hidden="true"></div>
+  <div class="orb orb-c" aria-hidden="true"></div>
+
+  <!-- стеклянная шапка -->
+  <header class="app-header">
+    <div class="header-bar">
+      <div class="brand">
+        <span class="brand-mark">🕷️</span>
+        <span class="brand-name">Crawler</span>
       </div>
+      <nav class="top-nav">
+        <a class="btn btn-ghost" href="index.html">Главная</a>
+      </nav>
+    </div>
+  </header>
 
-      <div class="row" style="margin-top:8px">
-        <button id="crawl" class="btn btn-primary">Старт краулинга</button>
-        <button id="stop" class="btn btn-danger">Стоп</button>
-        <button id="copyIssues" class="btn">Копировать ошибки</button>
-      </div>
+  <main class="page-main">
+    <div class="wrap">
+      <div class="card">
+        <h1>SEO Crawler (Live)</h1>
+        <div class="muted">Непрерывный краулинг: новые ссылки подтягиваются автоматически</div>
 
-      <div class="row" style="margin-top:8px">
-        <label class="field" style="flex:0 1 220px">
-          <span>Автообновление</span>
-          <div style="display:flex;gap:10px;align-items:center">
-            <input id="autoRefresh" type="checkbox" />
-            <span class="muted">Период</span>
-            <input id="refreshMins" class="input" type="number" min="0.5" step="0.5" value="0.5" style="max-width:90px" />
-            <span class="muted">мин</span>
+        <div class="row" style="margin-top:10px">
+          <label class="field">
+            <span>Домен/URL</span>
+            <input id="domain" class="input" type="text" placeholder="https://garri-potter-lordfillm.ru" />
+          </label>
+          <label class="field">
+            <span>Глубина</span>
+            <input id="depth" class="input" type="number" min="0" step="1" value="1" />
+          </label>
+          <label class="field">
+            <span>Лимит страниц</span>
+            <input id="limit" class="input" type="number" min="1" step="1" value="5000" />
+          </label>
+          <label class="field">
+            <span>Конкурентность</span>
+            <input id="concurrency" class="input" type="number" min="1" max="10" step="1" value="4" />
+          </label>
+          <label class="field">
+            <span>Таймаут (сек)</span>
+            <input id="timeout" class="input" type="number" min="3" step="1" value="15" />
+          </label>
+        </div>
+
+        <div class="row" style="margin-top:8px">
+          <button id="crawl" class="btn btn-primary">Старт краулинга</button>
+          <button id="stop" class="btn btn-danger">Стоп</button>
+          <button id="copyIssues" class="btn">Копировать ошибки</button>
+        </div>
+
+        <div class="row" style="margin-top:8px">
+          <label class="field" style="flex:0 1 260px">
+            <span>Автообновление</span>
+            <div class="autorefresh-line">
+              <input id="autoRefresh" type="checkbox" />
+              <span class="muted">Период</span>
+              <input id="refreshMins" class="input input-compact" type="number" min="0.5" step="0.5" value="0.5" />
+              <span class="muted">мин</span>
+            </div>
+          </label>
+        </div>
+
+        <div class="statusbar" style="margin-top:12px">
+          <div class="progress" style="flex:1 1 260px">
+            <span id="bar"></span>
           </div>
-        </label>
-      </div>
-
-      <div class="statusbar" style="margin-top:12px">
-        <div class="progress" style="flex:1 1 260px">
-          <span id="bar"></span>
+          <div>Готово: <b id="done">0</b> / <b id="total">0</b></div>
+          <div id="inlineLoader" class="inline-load">
+            <span class="dot"></span><span>Загрузка…</span>
+          </div>
         </div>
-        <div>Готово: <b id="done">0</b> / <b id="total">0</b></div>
-        <div id="inlineLoader" class="inline-load">
-          <span class="dot"></span><span>Загрузка…</span>
+
+        <div id="msg" class="msg" style="margin-top:10px">Готово к запуску</div>
+      </div>
+
+      <div class="card">
+        <h2>Найденные URL</h2>
+        <textarea id="urls" spellcheck="false" class="input" style="min-height:120px" placeholder="Здесь появятся найденные ссылки (в реальном времени)"></textarea>
+      </div>
+
+      <div class="card">
+        <h2>Результаты</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:60px">#</th>
+                <th>URL</th>
+                <th style="width:22%">Title</th>
+                <th style="width:28%">Description</th>
+                <th style="width:22%">H1</th>
+                <th style="width:70px;text-align:center">OK</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
         </div>
       </div>
 
-      <div id="msg" class="msg" style="margin-top:10px">Готово к запуску</div>
-    </div>
-
-    <div class="card">
-      <h2>Найденные URL</h2>
-      <textarea id="urls" spellcheck="false" class="input" style="min-height:120px" placeholder="Здесь появятся найденные ссылки (в реальном времени)"></textarea>
-    </div>
-
-    <div class="card">
-      <h2>Результаты</h2>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th style="width:60px">#</th>
-              <th>URL</th>
-              <th style="width:22%">Title</th>
-              <th style="width:28%">Description</th>
-              <th style="width:22%">H1</th>
-              <th style="width:70px;text-align:center">OK</th>
-            </tr>
-          </thead>
-          <tbody id="tbody"></tbody>
-        </table>
+      <div class="card">
+        <div class="issues-head">
+          <h2>Проблемы</h2>
+        </div>
+        <div id="issues-empty" class="muted">Пока нет найденных проблем</div>
+        <div id="issues" class="issues"></div>
       </div>
     </div>
+  </main>
 
-    <div class="card">
-      <div class="issues-head">
-        <h2>Проблемы</h2>
-      </div>
-      <div id="issues-empty" class="muted">Пока нет найденных проблем</div>
-      <div id="issues" class="issues"></div>
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <p class="muted">© 2025 — Джатсу</p>
     </div>
-  </div>
+  </footer>
 
   <script src="krayl-scripts.js"></script>
 </body>
 </html>
+
