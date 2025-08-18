@@ -70,11 +70,11 @@ console.log('app: home-only discovery');
   // === Utils
   function setMsg(text, type=''){ msgBox.className = 'msg ' + (type||''); msgBox.innerHTML = text; }
   function setLoading(v){ inlineLoader.classList.toggle('show', !!v); }
-function escapeHTML(s){ return String(s??'').replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
-function anchorHTML(url){
-  const u = escapeHTML(url);
-  return `<a href="${u}" target="_blank" rel="noopener noreferrer" class="url-link" title="${u}">${u}</a>`;
-}
+  function escapeHTML(s){ return String(s??'').replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
+  function anchorHTML(url){
+    const u = escapeHTML(url);
+    return `<a href="${u}" target="_blank" rel="noopener noreferrer" class="url-link" title="${u}">${u}</a>`;
+  }
 
   function normalizeHost(h){
     try{
@@ -153,20 +153,50 @@ function anchorHTML(url){
     throw lastErr || new Error('Failed to fetch');
   }
 
+  // === SEO + Article Body parse
   function parseSEO(html){
     const doc = new DOMParser().parseFromString(html, 'text/html');
+
     const title = (doc.querySelector('title')?.textContent || '').trim() || '—';
     const desc =
       (doc.querySelector('meta[name="description"]')?.content || '').trim() ||
       (doc.querySelector('meta[property="og:description"]')?.content || '').trim() ||
       (doc.querySelector('meta[name="twitter:description"]')?.content || '').trim() || '—';
     const h1s = [...doc.querySelectorAll('h1')].map(h=>h.textContent.trim()).filter(Boolean);
-    return { title, desc, h1: h1s.length ? h1s.join(' | ') : '—' };
+
+    // --- целевой второй articleBody ПОСЛЕ <script data-noptimize data-wpfc-render="false">
+    const bodies = [...doc.querySelectorAll('div.prose.w-full.max-w-full[itemprop="articleBody"]')];
+    const markerScripts = [...doc.querySelectorAll('script[data-noptimize][data-wpfc-render="false"]')];
+
+    function isAfter(a, b){ return !!(a && b && (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING)); }
+
+    let bodyEl = null;
+    if (bodies.length > 1 && markerScripts.length) {
+      const lastScript = markerScripts[markerScripts.length - 1];
+      bodyEl = bodies.find(b => isAfter(lastScript, b)) || bodies[1] || bodies[bodies.length - 1];
+    } else if (bodies.length > 1) {
+      bodyEl = bodies[1];
+    } else {
+      bodyEl = bodies[0] || null;
+    }
+
+    const bodyPCount = bodyEl ? bodyEl.querySelectorAll('p').length : 0;
+    const bodyTextLen = bodyEl ? (bodyEl.textContent || '').replace(/\s+/g,' ').trim().length : 0;
+    const hasBody = !!bodyEl && bodyPCount > 0 && bodyTextLen > 0;
+
+    return {
+      title,
+      desc,
+      h1: h1s.length ? h1s.join(' | ') : '—',
+      hasBody,
+      bodyPCount,
+      bodyTextLen
+    };
   }
 
   function parseLinksFromHTML(html, baseUrl){
     const doc = new DOMParser().parseFromString(html, 'text/html');
-    // НИКАКИХ discovery из <link rel="alternate"> — мы строго home-only
+    // НИКАКИХ discovery из <link rel="alternate"> — строго home-only
     const urls = [...doc.querySelectorAll('a[href]')]
       .map(a => a.getAttribute('href'))
       .filter(Boolean)
@@ -176,31 +206,43 @@ function anchorHTML(url){
   }
 
   // === Table UI
-function addRow(i, url){
-  const tr = document.createElement('tr');
-  tr.dataset.idx = i;
-  tr.innerHTML = `
-    <td data-label="#">${i+1}</td>
-    <td class="urlcell mono" data-label="URL">${anchorHTML(url)}</td>   <!-- вот тут -->
-    <td class="mono" data-label="Title">—</td>
-    <td class="mono" data-label="Description">—</td>
-    <td class="mono" data-label="H1">—</td>
-    <td class="mono" data-label="OK" style="text-align:center">…</td>
-  `;
-  tbody.appendChild(tr);
-}
+  // Порядок колонок теперь: #, URL, Title, Description, H1, Статья, OK
+  function addRow(i, url){
+    const tr = document.createElement('tr');
+    tr.dataset.idx = i;
+    tr.innerHTML = `
+      <td data-label="#">${i+1}</td>
+      <td class="urlcell mono" data-label="URL">${anchorHTML(url)}</td>
+      <td class="mono" data-label="Title">—</td>
+      <td class="mono" data-label="Description">—</td>
+      <td class="mono" data-label="H1">—</td>
+      <td class="mono" data-label="Статья" style="text-align:center">…</td>
+      <td class="mono" data-label="OK" style="text-align:center">…</td>
+    `;
+    tbody.appendChild(tr);
+  }
 
   function updateRow(i, seo, okState){
     const tr = tbody.querySelector(`tr[data-idx="${i}"]`);
     if(!tr) return;
+    // индексы: 0 #, 1 URL, 2 Title, 3 Description, 4 H1, 5 Статья, 6 OK
     tr.children[2].innerHTML = escapeHTML(seo.title ?? '—');
     tr.children[3].innerHTML = escapeHTML(seo.desc ?? '—');
     tr.children[4].innerHTML = escapeHTML(seo.h1 ?? '—');
+
+    // колонка "Статья": отдельный индикатор по hasBody
+    const articleSymbol = seo.hasBody ? '✓' : '✖';
+    tr.children[5].textContent = articleSymbol;
+    tr.children[5].className = 'mono ' + (seo.hasBody ? 'ok' : 'bad');
+
+    // колонка "OK": общий статус
     const symbol = okState==='ok' ? '✓' : '✖';
-    tr.children[5].textContent = symbol;
-    tr.children[5].className = 'mono ' + (okState==='ok' ? 'ok' : 'bad');
-    if (okState==='bad') tr.classList.add('row-bad');
+    tr.children[6].textContent = symbol;
+    tr.children[6].className = 'mono ' + (okState==='ok' ? 'ok' : 'bad');
+
+    if (okState==='bad') tr.classList.add('row-bad'); else tr.classList.remove('row-bad');
   }
+
   function updateProgress(done, total){
     doneEl.textContent = String(done);
     totalEl.textContent = String(total);
@@ -215,11 +257,16 @@ function addRow(i, url){
     const desc  = (seo.desc  || '').trim();
     const h1    = (seo.h1    || '').trim();
 
-    if (!title || title === '—') list.push({ type:'title-missing', text:'Отсутствует SEO-заголовок (Title)' });
-    if (!desc || desc === '—')   list.push({ type:'desc-missing',  text:'Неправильное мета-описание (нет описания)' });
+    if (!title || title === '—') list.push({ type:'title-missing', text:'Отсутствует SEO-заголовок' });
+    if (!desc || desc === '—')   list.push({ type:'desc-missing',  text:'Неправильное мета-описание' });
     if (desc && desc !== '—' && desc.length < 60)
       list.push({ type:'desc-short', text:`Неправильное мета-описание (<60 символов: ${desc.length})` });
     if (!h1 || h1 === '—')       list.push({ type:'h1-missing',    text:'Отсутствует H1' });
+
+    // Проверка второго articleBody
+    if (!seo.hasBody) {
+      list.push({ type:'body-missing', text:'Отсутствует текст статьи ' });
+    }
 
     if (list.length){
       issues.push({ url, items:list });
@@ -227,35 +274,43 @@ function addRow(i, url){
     }
     return list.length > 0;
   }
-function renderIssue(issue){
-  if (issuesEmpty) issuesEmpty.style.display = 'none';
-  const box = document.createElement('div');
-  box.className = 'issue-item';
-  const urlHTML = anchorHTML(issue.url); // <— используем якорь
-  box.innerHTML = `<b>${urlHTML}</b>`;
-  const tags = document.createElement('div');
-  tags.className = 'issue-tags';
-  issue.items.forEach(it=>{
-    const t = document.createElement('span');
-    t.className = 'tag tag-bad';
-    t.textContent = it.text;
-    tags.appendChild(t);
-  });
-  box.appendChild(tags);
-  issuesWrap.appendChild(box);
-}
+
+  function renderIssue(issue){
+    if (issuesEmpty) issuesEmpty.style.display = 'none';
+    const box = document.createElement('div');
+    box.className = 'issue-item';
+    const urlHTML = anchorHTML(issue.url);
+    box.innerHTML = `<b>${urlHTML}</b>`;
+    const tags = document.createElement('div');
+    tags.className = 'issue-tags';
+    issue.items.forEach(it=>{
+      const t = document.createElement('span');
+      t.className = 'tag tag-bad';
+      t.textContent = it.text;
+      tags.appendChild(t);
+    });
+    box.appendChild(tags);
+    issuesWrap.appendChild(box);
+  }
 
   function resetIssues(){
     issues = [];
     issuesWrap.innerHTML = '';
     issuesEmpty && (issuesEmpty.style.display = '');
   }
+
   function copyIssuesToClipboard(){
     if (!issues.length){
       navigator.clipboard.writeText('').then(()=>setMsg('Ошибок не найдено, копировать нечего','success'));
       return;
     }
-    const groups = { 'desc-missing': [], 'desc-short': [], 'title-missing': [], 'h1-missing': [] };
+    const groups = {
+      'desc-missing': [],
+      'desc-short':   [],
+      'title-missing':[],
+      'h1-missing':   [],
+      'body-missing': []
+    };
     for (const row of issues){
       for (const it of row.items){
         if (groups[it.type]) groups[it.type].push(row.url);
@@ -266,7 +321,8 @@ function renderIssue(issue){
         makeBlock(groups['desc-missing'], 'Неправильное мета-описание')
       + makeBlock(groups['desc-short'],   'Неправильное мета-описание')
       + makeBlock(groups['title-missing'],'Отсутствует SEO-заголовок')
-      + makeBlock(groups['h1-missing'],   'Отсутствует H1');
+      + makeBlock(groups['h1-missing'],   'Отсутствует H1')
+      + makeBlock(groups['body-missing'], 'Отсутствует текст статьи');
 
     navigator.clipboard.writeText(output.trim()).then(()=>{
       const total = Object.values(groups).reduce((a,arr)=>a+arr.length,0);
@@ -276,7 +332,7 @@ function renderIssue(issue){
     });
   }
 
-  // === CORE: home-only discovery + one-time page processing
+  // === CORE
   async function liveCrawl(startUrl, { maxDepth=1, pageLimit=5000, fetchTimeout=15000, concurrency=4 } = {}){
     // reset
     stopFlag = false; controllers.forEach(c=>c.abort('restart')); controllers.clear();
@@ -325,7 +381,6 @@ function renderIssue(issue){
         updateRow(rowIndex, seo, hasProblems ? 'bad' : 'ok');
         results[rowIndex] = { url, ...seo, ok: hasProblems ? 'bad' : 'ok' };
 
-        // расширяем ТОЛЬКО с главной (depth 0 -> 1), и только один раз
         if (depth < Math.min(EXPAND_DEPTH, Number(maxDepth)||1)){
           const links = parseLinksFromHTML(html, url);
           for (const nu of links){
@@ -334,7 +389,7 @@ function renderIssue(issue){
         }
       }catch(e){
         console.warn('process error', url, e);
-        updateRow(rowIndex, {title:'',desc:'',h1:''}, 'bad');
+        updateRow(rowIndex, {title:'',desc:'',h1:'',hasBody:false}, 'bad');
         issues.push({ url, items:[
           {type:'title-missing', text:'Отсутствует SEO-заголовок (ошибка загрузки)'},
           {type:'desc-missing',  text:'Неправильное мета-описание (ошибка загрузки)'}
@@ -351,10 +406,10 @@ function renderIssue(issue){
       }
     }
 
-    // старт: сканируем именно главную (даже если введён под-URL)
+    // старт: главная
     enqueuePage(SITE.homeUrl, 0);
 
-    // воркеры — постоянные
+    // воркеры
     const N = Math.max(1, Math.min(concurrency, 10));
     async function worker(){
       while (!stopFlag){
@@ -366,7 +421,7 @@ function renderIssue(issue){
     }
     Array.from({length:N}, ()=>worker());
 
-    // строгий 30с refresh: ОПРАШИВАЕМ ТОЛЬКО ГЛАВНУЮ, вытягиваем ТОЛЬКО новые ссылки
+    // refresh главной каждые 30с
     async function refreshHome(){
       if (stopFlag || refreshing) return;
       refreshing = true;
@@ -392,7 +447,6 @@ function renderIssue(issue){
 
     clearInterval(refreshTimer);
     refreshTimer = setInterval(refreshHome, REFRESH_MS);
-    // первый прогон сразу
     refreshHome();
 
     setLoading(false);
@@ -426,4 +480,6 @@ function renderIssue(issue){
     copyIssuesToClipboard();
   });
 })();
+
+
 
