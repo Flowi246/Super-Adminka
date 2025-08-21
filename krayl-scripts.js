@@ -27,6 +27,9 @@ console.log('app: home-only discovery');
   const issuesWrap = $('#issues');
   const issuesEmpty = $('#issues-empty');
 
+  // >>> НОВОЕ: переключатель режима
+  const jmodeEl = $('#jmode'); // select: "1" (articleBody) / "2" (description1)
+
   // === State
   let stopFlag = false;
   let controllers = new Set();
@@ -153,7 +156,7 @@ console.log('app: home-only discovery');
     throw lastErr || new Error('Failed to fetch');
   }
 
-  // === SEO + Article Body parse
+  // === SEO + Body parse (режим Джатсу 1/2)
   function parseSEO(html){
     const doc = new DOMParser().parseFromString(html, 'text/html');
 
@@ -164,25 +167,32 @@ console.log('app: home-only discovery');
       (doc.querySelector('meta[name="twitter:description"]')?.content || '').trim() || '—';
     const h1s = [...doc.querySelectorAll('h1')].map(h=>h.textContent.trim()).filter(Boolean);
 
-    // --- целевой второй articleBody ПОСЛЕ <script data-noptimize data-wpfc-render="false">
-    const bodies = [...doc.querySelectorAll('div.prose.w-full.max-w-full[itemprop="articleBody"]')];
-    const markerScripts = [...doc.querySelectorAll('script[data-noptimize][data-wpfc-render="false"]')];
-
-    function isAfter(a, b){ return !!(a && b && (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING)); }
-
+    // --- выбор цели в зависимости от режима
+    const mode = (jmodeEl?.value || '1'); // по умолчанию "1"
     let bodyEl = null;
-    if (bodies.length > 1 && markerScripts.length) {
-      const lastScript = markerScripts[markerScripts.length - 1];
-      bodyEl = bodies.find(b => isAfter(lastScript, b)) || bodies[1] || bodies[bodies.length - 1];
-    } else if (bodies.length > 1) {
-      bodyEl = bodies[1];
+
+    if (mode === '1') {
+      // Джатсу 1 → второй articleBody после скрипта
+      const bodies = [...doc.querySelectorAll('div.prose.w-full.max-w-full[itemprop="articleBody"]')];
+      const markerScripts = [...doc.querySelectorAll('script[data-noptimize][data-wpfc-render="false"]')];
+      function isAfter(a, b){ return !!(a && b && (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING)); }
+      if (bodies.length > 1 && markerScripts.length) {
+        const lastScript = markerScripts[markerScripts.length - 1];
+        bodyEl = bodies.find(b => isAfter(lastScript, b)) || bodies[1] || bodies[bodies.length - 1];
+      } else if (bodies.length > 1) {
+        bodyEl = bodies[1];
+      } else {
+        bodyEl = bodies[0] || null;
+      }
     } else {
-      bodyEl = bodies[0] || null;
+      // Джатсу 2 → div.description1.mt1.no-lm
+      bodyEl = doc.querySelector('div.description1.mt1.no-lm');
     }
 
+    // считаем контент «живым», если есть <p> ИЛИ ненулевая текстовая длина
     const bodyPCount = bodyEl ? bodyEl.querySelectorAll('p').length : 0;
     const bodyTextLen = bodyEl ? (bodyEl.textContent || '').replace(/\s+/g,' ').trim().length : 0;
-    const hasBody = !!bodyEl && bodyPCount > 0 && bodyTextLen > 0;
+    const hasBody = !!bodyEl && (bodyPCount > 0 || bodyTextLen > 0);
 
     return {
       title,
@@ -206,7 +216,7 @@ console.log('app: home-only discovery');
   }
 
   // === Table UI
-  // Порядок колонок теперь: #, URL, Title, Description, H1, Статья, OK
+  // Порядок колонок: #, URL, Title, Description, H1, Статья, OK
   function addRow(i, url){
     const tr = document.createElement('tr');
     tr.dataset.idx = i;
@@ -235,7 +245,7 @@ console.log('app: home-only discovery');
     tr.children[5].textContent = articleSymbol;
     tr.children[5].className = 'mono ' + (seo.hasBody ? 'ok' : 'bad');
 
-    // колонка "OK": общий статус
+    // колонка "OK": общий статус (meta+h1+body)
     const symbol = okState==='ok' ? '✓' : '✖';
     tr.children[6].textContent = symbol;
     tr.children[6].className = 'mono ' + (okState==='ok' ? 'ok' : 'bad');
@@ -263,9 +273,9 @@ console.log('app: home-only discovery');
       list.push({ type:'desc-short', text:`Неправильное мета-описание (<60 символов: ${desc.length})` });
     if (!h1 || h1 === '—')       list.push({ type:'h1-missing',    text:'Отсутствует H1' });
 
-    // Проверка второго articleBody
+    // Проверка текста статьи (режим Джатсу 1/2)
     if (!seo.hasBody) {
-      list.push({ type:'body-missing', text:'Отсутствует текст статьи ' });
+      list.push({ type:'body-missing', text:'Отсутствует текст статьи' });
     }
 
     if (list.length){
@@ -475,11 +485,13 @@ console.log('app: home-only discovery');
     setLoading(false);
     setMsg('Остановлено пользователем','error');
   });
+  
 
   copyBtn?.addEventListener('click', ()=>{
     copyIssuesToClipboard();
   });
 })();
+
 
 
 

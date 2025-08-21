@@ -305,4 +305,31 @@ tbody tr.row-bad{box-shadow:inset 3px 0 0 rgba(239,68,68,.9), inset 0 -1px 0 rgb
   .urlcell{max-width:100%}
 }
 
+/* === Styled select (Джатсу режим) === */
+/* глобально просим тёмный нативный UI для системных виджетов */
+:root{
+  color-scheme: dark; /* влияет на нативные списки, скроллбары и т.п. */
+}
+
+/* конкретно для нашего селекта режима */
+#jmode{
+  color-scheme: dark; /* дублируем, чтобы точно применилось */
+  background-color: rgba(255,255,255,0.04);
+  color: var(--text, #e8eef6);
+  border: 1px solid var(--border, #1b2633);
+}
+
+/* фоновый цвет элементов списка там, где это поддерживается */
+#jmode option,
+#jmode optgroup{
+  background-color: var(--table, #0e141b);
+  color: var(--text, #e8eef6);
+}
+
+/* фокус/hover рамка на самом поле (не на выпадающем списке) */
+#jmode:focus{
+  outline: none;
+  border-color: var(--accent, #12c2a9);
+  box-shadow: 0 0 0 3px rgba(18,194,169,.15);
+}
 
