@@ -1,0 +1,366 @@
+:root{
+  /* Цвета */
+  --bg:#0b0f14;
+  --surface:#0f151f;
+  --surface-2:#101824;
+  --table:#0d131b;
+  --text:#e9eef7;
+  --muted:#9fb0c4;
+
+  --primary:#6b9aff;
+  --primary-strong:#a9c1f3;
+  --accent:#12c2a9;
+  --danger:#ef4444;
+  --warn:#f59e0b;
+  --ok:#22c55e;
+
+  --border:#1b2633;
+  --thead:#0f1620;
+
+  /* Ритм / размеры */
+  --gap:16px;
+  --radius:14px;
+  --control-h:40px;
+
+  /* Эффекты */
+  --shadow:0 10px 30px rgba(0,0,0,.35);
+  --shadow-soft:0 6px 18px rgba(0,0,0,.22);
+  --ring:0 0 0 2px rgba(123,166,255,.45);
+}
+
+*{box-sizing:border-box}
+*:focus{outline:none}
+:focus-visible{box-shadow:var(--ring); border-color:rgba(91,141,255,.55) !important}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none !important; transition:none !important}
+}
+
+html, body {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+body {
+  margin: 0;
+  color: var(--text);
+  font: 14px/1.55 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* фиксированный фон */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(1200px 800px at 10% -10%, rgba(18,194,169,.07), transparent 55%),
+    radial-gradient(1000px 700px at 110% 0%, rgba(91,141,255,.09), transparent 60%),
+    linear-gradient(180deg,#0b0f14,#0c121a);
+  background-repeat: no-repeat;
+  background-size: cover, cover, 100% 100%;
+  will-change: transform;
+}
+
+
+/* орбы (декор) */
+.orb{position:fixed; filter:blur(40px); opacity:.45; z-index:-1; pointer-events:none;}
+.orb-a{width:420px;height:420px;background:radial-gradient(circle at 30% 30%, #4e86ff, transparent 60%); top:-120px; left:-80px;}
+.orb-b{width:520px;height:520px;background:radial-gradient(circle at 70% 40%, #12c2a9, transparent 65%); bottom:-160px; right:-120px;}
+.orb-c{width:300px;height:300px;background:radial-gradient(circle at 50% 50%, #7aa4ff, transparent 60%); top:42%; left:-120px;}
+
+/* стеклянная шапка */
+.app-header{
+  position:sticky; top:0; z-index:10;
+  backdrop-filter: blur(10px);
+  background:linear-gradient(180deg, rgba(17,23,34,.65), rgba(17,23,34,.35));
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+.header-bar{
+  max-width:1120px; margin:0 auto; padding:14px 18px;
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+}
+.brand{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.2px}
+.brand-name{
+  background:linear-gradient(90deg,#88b0ff,#12c2a9);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.top-nav{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+.top-nav a{color:#cfe0ff; text-decoration:none; opacity:.9}
+.top-nav a:hover{opacity:1; text-decoration:underline}
+
+/* основной контейнер */
+.page-main{ padding:20px 0 }
+.wrap{
+  max-width:1120px;
+  margin:24px auto 40px;
+  padding:0 18px;
+  display:flex;
+  flex-direction:column;
+  gap:var(--gap);
+}
+
+/* Cards */
+.card{
+  background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02)), var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:18px;
+}
+h1{margin:0 0 6px;font-size:22px;letter-spacing:.2px}
+h2{margin:0 0 10px;font-size:18px}
+.muted{color:var(--muted);font-size:12px}
+
+/* Form */
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+label.field{display:flex;flex-direction:column;gap:6px;flex:1 1 260px}
+
+.input{
+  width:100%;
+  height:var(--control-h);
+  background:linear-gradient(180deg,#0e1520,#0b1119);
+  color:var(--text);
+  border:1px solid #1a2634;
+  border-radius:12px;
+  padding:0 12px;
+  outline:none;
+  transition:border-color .15s, box-shadow .15s, transform .06s, background .15s;
+}
+.input:hover{border-color:#283a50}
+.input:active{transform:translateY(0)}
+
+/* Buttons */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  height:var(--control-h);
+  padding:0 14px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:linear-gradient(180deg,#141c26,#111822);
+  color:var(--text);
+  cursor:pointer;
+  transition:transform .12s, box-shadow .12s, background .12s, border-color .12s;
+  box-shadow:var(--shadow-soft);
+  text-decoration:none;
+}
+.btn:hover{ transform:translateY(-1px); border-color:#2a3a4f; background:linear-gradient(180deg,#182231,#121a25); }
+.btn:active{ transform:translateY(0); }
+.btn[disabled]{opacity:.6;pointer-events:none}
+.btn-ghost{
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);
+}
+.btn-primary{
+  background:linear-gradient(180deg,var(--primary),var(--primary-strong));
+  color:#08101a;
+  border-color:transparent;
+}
+.btn-primary:hover{ background:linear-gradient(180deg,#7aa7ff,#4e86ff); }
+
+/* Chips (используем как «issues-tags») */
+.issues-tags{display:flex;flex-wrap:wrap;gap:8px}
+.issues-tags .tag{
+  font-size:12px;padding:6px 10px;border-radius:999px;
+  border:1px solid #2a3a4f;background:#13202d; color:#cfe0ff
+}
+.issues-tags .tag.warn{
+  background:rgba(245,158,11,.12); border-color:rgba(245,158,11,.35); color:#ffd17a;
+}
+.issues-tags .tag.ok{
+  background:rgba(34,197,94,.12); border-color:rgba(34,197,94,.35); color:#b7f5cb;
+}
+
+/* Table */
+.table-wrap{
+  overflow:auto;
+  max-height:62vh;
+  border-radius:12px;
+  box-shadow:inset 0 0 0 1px var(--border);
+  background:var(--table);
+}
+
+table{
+  width:100%;
+  border-collapse:separate;border-spacing:0;
+  table-layout:fixed;
+  word-wrap:break-word;
+  color:var(--text);
+}
+thead th{
+  position:sticky;top:0;z-index:2;
+  background:linear-gradient(180deg,#101724,#0c121a);
+  border-bottom:1px solid var(--border);
+  text-align:left;padding:12px;font-weight:600;color:#d5e1f5
+}
+tbody td{
+  padding:11px 12px;border-bottom:1px solid rgba(27,38,51,.6);
+  vertical-align:top;white-space:normal;word-break:break-word
+}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:nth-child(odd){background:rgba(255,255,255,.02)}
+tbody tr:hover{background:rgba(91,141,255,.06)}
+
+.mono{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;
+  font-size:13px;
+}
+.status.ok{color:var(--ok);font-weight:700}
+.status.warn{color:var(--warn);font-weight:700}
+.status.fail{color:var(--danger);font-weight:700}
+
+/* Footer */
+.app-footer{
+  padding:18px 0; color:var(--muted);
+  border-top:1px solid rgba(255,255,255,.06);
+  background:rgba(15,21,31,.35);
+  backdrop-filter: blur(6px);
+}
+.footer-inner{max-width:1120px; margin:0 auto; padding:0 18px}
+
+/* Mobile — превращаем таблицу в карточки */
+@media (max-width:768px){
+  .wrap{gap:14px}
+  .table-wrap{max-height:none}
+  table, thead, tbody, th, td, tr {display:block;width:100%}
+  thead{display:none}
+  tbody tr{
+    margin:12px 0;
+    border:1px solid var(--border);
+    border-radius:12px;
+    background:linear-gradient(180deg,#0f151f,#0c1217);
+    padding:8px
+  }
+  tbody td{border:none;padding:7px 8px}
+  tbody td::before{
+    content:attr(data-label);
+    display:block;font-size:12px;color:var(--muted);margin-bottom:4px;
+  }
+}
+/* === Детали / Действия — оформление === */
+
+/* сами ячейки */
+.details-cell,
+.actions-cell{
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.details-cell a.btn-small{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,.08);
+  background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+  color: #cfe0ff;
+  text-decoration: none;
+  box-shadow: var(--shadow-soft);
+}
+.details-cell a.btn-small:hover{
+  background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+  border-color: rgba(255,255,255,.12);
+  transform: translateY(-1px);
+}
+.details-cell a.btn-small:active{ transform: translateY(0) }
+
+/* контейнер для двух кнопок в действиях */
+.row-actions{
+  display: inline-flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* базовый вид «малых» кнопок */
+.btn-small{
+  display:inline-flex; align-items:center; justify-content:center;
+  gap:8px;
+  height: 34px;
+  padding: 0 12px;
+  font-size: 12.5px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg,#141c26,#111822);
+  color: var(--text);
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  text-decoration: none;
+  transition: transform .12s, box-shadow .12s, background .12s, border-color .12s;
+}
+.btn-small:hover{
+  transform: translateY(-1px);
+  border-color: #2a3a4f;
+  background: linear-gradient(180deg,#182231,#121a25);
+}
+.btn-small:active{ transform: translateY(0) }
+
+/* варианты */
+.btn-small.primary{
+  background: linear-gradient(180deg,var(--primary),var(--primary-strong));
+  border-color: transparent;
+  color: #0a1020;
+  font-weight: 700;
+}
+.btn-small.primary:hover{
+  background: linear-gradient(180deg,#7aa7ff,#4e86ff);
+}
+
+.btn-small.ghost{
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  color: #cfe0ff;
+}
+.btn-small.ghost:hover{
+  background: rgba(255,255,255,.06);
+  border-color: rgba(255,255,255,.14);
+}
+
+/* ссылка в действиях как «призрачная» */
+.actions-cell a.btn-small{ text-decoration: none }
+
+/* мини-иконки через псевдоэлементы */
+.btn-small.icon-open::before{
+  content: "🔗";
+  font-size: 14px;
+}
+.btn-small.icon-copy::before{
+  content: "📋";
+  font-size: 14px;
+}
+.details-cell a.btn-small.icon-download::before{
+  content: "⬇️";
+  font-size: 14px;
+}
+
+/* мобильные карточки: переносим кнопки на новую строку */
+@media (max-width:768px){
+  .row-actions{ display:flex; width:100%; }
+  .actions-cell .btn-small{ width: 100%; }
+  .details-cell a.btn-small{ width: 100%; justify-content: center; }
+}
+
+html, body {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-main {
+  flex: 1; /* растягиваем контент на всю доступную высоту */
+}
+
+.app-footer {
+  margin-top: auto; /* футер уходит вниз */
+}
+
+/* Scrollbars */
+*{scrollbar-width:thin;scrollbar-color:#2a3a4f #0f161f}
+*::-webkit-scrollbar{height:10px;width:10px}
+*::-webkit-scrollbar-track{background:#0f161f}
+*::-webkit-scrollbar-thumb{background:#2a3a4f;border:2px solid #0f161f;border-radius:8px}
