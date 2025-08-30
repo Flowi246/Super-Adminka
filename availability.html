@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Проверка наличия проекта — Все API</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Подключаем только стили этой страницы (тёмная тема как в примере) -->
+  <link rel="stylesheet" href="availability.css" />
+</head>
+<body>
+
+  <!-- декоративные «орбы» -->
+  <div class="orb orb-a"></div>
+  <div class="orb orb-b"></div>
+  <div class="orb orb-c"></div>
+
+  <!-- Шапка -->
+  <header class="app-header">
+    <div class="header-bar">
+      <div class="brand">
+        <span class="brand-name">Наличия на балансерах</span>
+      </div>
+           <nav class="top-nav">
+        <a class="btn btn-ghost" href="index.html">Главная</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-main">
+    <div class="wrap">
+
+      <div class="card">
+        <h1>Проверка наличия проекта на видеобалансерах</h1>
+        <p class="muted">Введите <b>Kinopoisk ID</b> и нажмите «Проверить».</p>
+
+        <div class="row" style="margin-top:12px">
+          <label class="field">
+            <span class="muted">Kinopoisk ID</span>
+            <input id="kpId" class="input" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="Напр.: 535341" />
+          </label>
+
+          <button id="checkBtn" class="btn btn-primary">Проверить</button>
+          <button id="resetBtn" class="btn btn-ghost">Сбросить</button>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <div id="chips" class="issues-tags"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table class="table" id="resultTable">
+            <thead>
+              <tr>
+                <th>Балансер</th>
+                <th>Статус</th>
+                <th>Название</th>
+                <th>Детали</th>
+                <th>Действия</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"><!-- строки создаёт JS --></tbody>
+          </table>
+        </div>
+        <p class="muted" style="margin-top:10px"></p>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="app-footer">
+    <div class="footer-inner">
+      Супер Админка • Наличия на балансерах
+    </div>
+  </footer>
+
+  <script src="availability-check.js"></script>
+</body>
+</html>
