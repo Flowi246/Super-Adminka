@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Генератор проектов + Парсер Википедии</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="./project-tools.css" />
+    <div id="header-placeholder"></div>
+
+</head>
+<body>
+  <!-- Шапка -->
+  <header class="app-header solid">
+    <div class="wrap">
+      <a class="logo" href="./index.html" title="На главную">
+        <span class="orb"></span>
+        <span class="brand">
+          <strong>Инструменты</strong>
+          <em>Парсер Вики & генерация файлов</em>
+        </span>
+      </a>
+      <nav class="tabs" role="tablist">
+        <button class="tab active" data-tab="series">Сериалы</button>
+        <button class="tab" data-tab="movies">Фильмы</button>
+        <button class="tab" data-tab="wiki">Вики-парсер</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- СЕРИАЛЫ -->
+    <section class="panel active" id="tab-series">
+      <div class="card">
+        <h2>Создание файла проектов — Сериалы</h2>
+        <div class="grid">
+          <label class="field">
+            <span>Домен</span>
+            <input type="text" id="series-domain" placeholder="svetlyachok-lordfilm.ru" />
+          </label>
+          <label class="field">
+            <span>Kinopoisk ID</span>
+            <input type="text" id="series-kp" placeholder="891337" />
+          </label>
+          <label class="field">
+            <span>Кол-во сезонов</span>
+            <input type="number" id="series-seasons" min="1" step="1" value="1" />
+          </label>
+        </div>
+        <div class="actions">
+          <button id="series-build" class="btn primary">Сформировать JSON</button>
+          <button id="series-download" class="btn" disabled>Скачать .json</button>
+        </div>
+        <details class="preview" open>
+          <summary>Предпросмотр</summary>
+          <pre id="series-preview" class="pre"></pre>
+        </details>
+      </div>
+    </section>
+
+    <!-- ФИЛЬМЫ -->
+    <section class="panel" id="tab-movies">
+      <div class="card">
+        <h2>Создание файла проектов — Фильмы</h2>
+        <div class="grid">
+          <label class="field">
+            <span>Домен</span>
+            <input type="text" id="movies-domain" placeholder="svetlyachok-lordfilm.ru" />
+          </label>
+          <label class="field wide">
+            <span>Список Kinopoisk ID <small class="muted">(каждый с новой строки / через запятую)</small></span>
+            <textarea id="movies-kp-list" rows="4" placeholder="891337&#10;301&#10;123456"></textarea>
+          </label>
+        </div>
+        <div class="actions">
+          <button id="movies-build" class="btn primary">Сформировать JSON</button>
+          <button id="movies-download" class="btn" disabled>Скачать .json</button>
+        </div>
+        <details class="preview" open>
+          <summary>Предпросмотр</summary>
+          <pre id="movies-preview" class="pre"></pre>
+        </details>
+      </div>
+    </section>
+
+    <!-- ВИКИ -->
+    <section class="panel" id="tab-wiki">
+      <div class="card">
+        <h2>Парсер Википедии (по Kinopoisk ID)</h2>
+        <div class="grid">
+          <label class="field">
+            <span>Kinopoisk ID</span>
+            <input type="text" id="wiki-kp" placeholder="666" />
+          </label>
+        </div>
+
+        <div class="actions">
+          <button id="wiki-run" class="btn primary">Получить заголовки → Сделать промты</button>
+          <button id="wiki-copy-prompts" class="btn" disabled>Копировать промты</button>
+          <button id="wiki-copy-headings" class="btn" disabled>Копировать HTML заголовков</button>
+        </div>
+
+        <div class="two-col">
+          <details class="preview" open>
+            <summary>Промты [[...]]</summary>
+            <textarea id="wiki-prompts" rows="12" class="mono"></textarea>
+          </details>
+          <details class="preview" open>
+            <summary>HTML заголовков (из Википедии)</summary>
+            <textarea id="wiki-headings" rows="12" class="mono"></textarea>
+          </details>
+        </div>
+
+        <div class="meta">
+          <div><b>Найдена статья:</b> <span id="wiki-title">—</span></div>
+          <div><b>Поисковый запрос:</b> <span id="wiki-query">—</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Футер: фиксированный снизу -->
+  <footer class="app-footer fixed">
+    <div class="wrap">
+      <div class="footer-left">
+        <span class="orb small"></span>
+        <span class="muted">© Джатсу • Инструменты</span>
+      </div>
+
+  </footer>
+
+  <script type="module" src="./project-tools.js"></script>
+</body>
+</html>
